@@ -1,25 +1,25 @@
 import knex from 'knex'
 
-// ✅ Экспортируем напрямую для использования в API
+// Если в продакшене будет PostgreSQL, можешь добавить проверку на process.env.DATABASE_URL
 export const db = knex({
-	client: 'sqlite3',
-	connection: {
-		filename: './database.sqlite',
+	client: 'pg',
+	connection: process.env.DATABASE_URL,
+	pool: {
+		min: 0,
+		max: 10,
 	},
-	useNullAsDefault: true,
 })
 
 // Создание таблиц
-
 async function createPositionsTable() {
-	await db.schema.createTableIfNotExists('positions', table => {
+	await db.schema.createTable('positions', table => {
 		table.increments('id').primary()
 		table.string('name').notNullable().unique()
 	})
 }
 
 async function createDepartmentsTable() {
-	await db.schema.createTableIfNotExists('departments', table => {
+	await db.schema.createTable('departments', table => {
 		table.increments('id').primary()
 		table.string('name').notNullable()
 		table
@@ -35,7 +35,7 @@ async function createDepartmentsTable() {
 }
 
 async function createUsersTable() {
-	await db.schema.createTableIfNotExists('users', table => {
+	await db.schema.createTable('users', table => {
 		table.increments('id').primary()
 		table.string('email').notNullable().unique()
 		table.string('password').notNullable()
@@ -58,7 +58,7 @@ async function createUsersTable() {
 			.references('id')
 			.inTable('users')
 			.onDelete('SET NULL')
-		table.enum('role', ['admin', 'manager', 'employee']).defaultTo('employee')
+		table.enu('role', ['admin', 'manager', 'employee']).defaultTo('employee')
 		table.string('avatar_url').nullable()
 		table.timestamp('created_at').defaultTo(db.fn.now())
 		table.timestamp('last_login').nullable()
@@ -66,11 +66,11 @@ async function createUsersTable() {
 }
 
 async function createEventsTable() {
-	await db.schema.createTableIfNotExists('events', table => {
+	await db.schema.createTable('events', table => {
 		table.increments('id').primary()
 		table.string('title').notNullable()
 		table
-			.enum('type', ['meeting', 'conference', 'workshop'])
+			.enu('type', ['meeting', 'conference', 'workshop'])
 			.defaultTo('meeting')
 		table.text('description').nullable()
 		table
@@ -89,7 +89,7 @@ async function createEventsTable() {
 }
 
 async function createInvitationsTable() {
-	await db.schema.createTableIfNotExists('invitations', table => {
+	await db.schema.createTable('invitations', table => {
 		table.increments('id').primary()
 		table
 			.integer('event_id')
@@ -106,7 +106,7 @@ async function createInvitationsTable() {
 			.inTable('users')
 			.onDelete('CASCADE')
 		table
-			.enum('status', ['pending', 'accepted', 'declined'])
+			.enu('status', ['pending', 'accepted', 'declined'])
 			.defaultTo('pending')
 		table.text('comment').nullable()
 		table.timestamp('created_at').defaultTo(db.fn.now())
@@ -115,7 +115,7 @@ async function createInvitationsTable() {
 }
 
 async function createNotificationsTable() {
-	await db.schema.createTableIfNotExists('notifications', table => {
+	await db.schema.createTable('notifications', table => {
 		table.increments('id').primary()
 		table
 			.integer('user_id')
@@ -140,7 +140,7 @@ async function createNotificationsTable() {
 }
 
 async function createNewsTable() {
-	await db.schema.createTableIfNotExists('news', table => {
+	await db.schema.createTable('news', table => {
 		table.increments('id').primary()
 		table.string('title').notNullable()
 		table.text('content').notNullable()
@@ -163,9 +163,8 @@ async function createNewsTable() {
 	})
 }
 
-// ✅ Таблица для формы поддержки
 async function createSupportRequestsTable() {
-	await db.schema.createTableIfNotExists('support_requests', table => {
+	await db.schema.createTable('support_requests', table => {
 		table.increments('id').primary()
 		table.string('name').notNullable()
 		table.string('email').notNullable()
@@ -175,10 +174,9 @@ async function createSupportRequestsTable() {
 	})
 }
 
-// Запуск создания всех таблиц
 export async function initDB() {
 	try {
-		console.log('🛠️ Инициализация базы данных...')
+		console.log('🛠️ Initializing database...')
 		await createPositionsTable()
 		await createDepartmentsTable()
 		await createUsersTable()
@@ -187,26 +185,24 @@ export async function initDB() {
 		await createNotificationsTable()
 		await createNewsTable()
 		await createSupportRequestsTable()
-		console.log('✅ Все таблицы успешно созданы и БД подключена')
+		console.log('✅ All tables created successfully')
 	} catch (error) {
-		console.error('❌ Ошибка инициализации БД:', error)
+		console.error('❌ Database initialization error:', error)
 		throw error
 	}
 }
 
-// Закрытие БД
 export async function closeDB() {
 	try {
 		await db.destroy()
-		console.log('✅ Соединение с базой данных закрыто')
+		console.log('✅ Database connection closed')
 	} catch (error) {
-		console.error('❌ Ошибка закрытия соединения с БД:', error)
+		console.error('❌ Error closing database connection:', error)
 	}
 }
 
-// Закрытие по Ctrl+C
 process.on('SIGINT', async () => {
-	console.log('\nЗавершение работы сервера...')
+	console.log('\nShutting down server...')
 	await closeDB()
 	process.exit(0)
 })

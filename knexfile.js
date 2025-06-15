@@ -1,30 +1,10 @@
 // knexfile.js
+
 module.exports = {
 	development: {
-		client: 'sqlite3', // Используем SQLite как базу данных
+		client: 'sqlite3',
 		connection: {
-			filename: './database.sqlite', // Путь к файлу базы данных
-		},
-		useNullAsDefault: true, // SQLite требует явного указания NULL для отсутствующих значений
-		migrations: {
-			tableName: 'knex_migrations', // Таблица для отслеживания миграций
-			directory: './migrations', // Папка для хранения файлов миграций
-		},
-		seeds: {
-			directory: './seeds', // Папка для хранения seed-файлов (начальные данные)
-		},
-		pool: {
-			afterCreate: (conn, done) => {
-				// Включение поддержки внешних ключей в SQLite
-				conn.run('PRAGMA foreign_keys = ON', done)
-			},
-		},
-	},
-
-	production: {
-		client: 'sqlite3', // Можно изменить на другую БД (например, PostgreSQL) для production
-		connection: {
-			filename: './database.sqlite', // Путь к файлу базы данных
+			filename: './database.sqlite',
 		},
 		useNullAsDefault: true,
 		migrations: {
@@ -36,9 +16,20 @@ module.exports = {
 		},
 		pool: {
 			afterCreate: (conn, done) => {
-				// Включение поддержки внешних ключей в SQLite
 				conn.run('PRAGMA foreign_keys = ON', done)
 			},
+		},
+	},
+
+	production: {
+		client: 'pg', // PostgreSQL
+		connection: process.env.DATABASE_URL, // URL от Railway
+		migrations: {
+			tableName: 'knex_migrations',
+			directory: './migrations',
+		},
+		seeds: {
+			directory: './seeds',
 		},
 	},
 }
