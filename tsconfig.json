@@ -1,0 +1,15 @@
+{
+	"extends": "./.nuxt/tsconfig.json",
+	"compilerOptions": {
+		"types": ["bcryptjs", "sqlite3"],
+		"strict": true,
+		"module": "ESNext",
+		"target": "ES2022",
+		"esModuleInterop": true,
+		"moduleResolution": "bundler",
+		"skipLibCheck": true,
+		"forceConsistentCasingInFileNames": true,
+		"resolveJsonModule": true
+	},
+	"exclude": ["node_modules", ".nuxt", "dist"]
+}

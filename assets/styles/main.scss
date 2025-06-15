@@ -1,0 +1,23 @@
+@use './fonts';
+@use './reset';
+@use './animations';
+
+// Подключение Font Awesome
+@use '/assets/Font-Awesome/css/fontawesome.css';
+@use '/assets/Font-Awesome/css/brands.css';
+@use '/assets/Font-Awesome/css/solid.css';
+
+
+* {
+  font-family: 'Euclid Circular A', sans-serif;
+  position: relative;
+}
+
+header, footer, main {
+  background-color: #F4F4F4;
+}
+
+.NuxtLink {
+  text-decoration: none;
+  cursor: pointer;
+}
