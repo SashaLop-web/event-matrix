@@ -18,10 +18,18 @@ export default defineNuxtConfig({
 	},
 
 	modules: ['@pinia/nuxt'],
-
 	plugins: ['~/plugins/auth.ts'],
 
-	
+	// 👇 Добавить это
+	server: {
+		port: process.env.PORT || 3000,
+		host: '0.0.0.0',
+	},
+
+	nitro: {
+		preset: 'node',
+	},
+
 	compatibilityDate: '2024-11-01',
 
 	devtools: {
